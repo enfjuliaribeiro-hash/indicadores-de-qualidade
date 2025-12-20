@@ -1,0 +1,1232 @@
+import React, { useState, useMemo } from 'react';
+
+// Ícones em SVG para garantir compatibilidade total e evitar erros de carregamento de biblioteca externa
+const Icon = ({ name, className = "w-6 h-6" }) => {
+  const icons = {
+    ChevronRight: <path d="m9 18 6-6-6-6" />,
+    Target: <>
+      <circle cx="12" cy="12" r="10" />
+      <circle cx="12" cy="12" r="6" />
+      <circle cx="12" cy="12" r="2" />
+    </>,
+    Info: <>
+      <circle cx="12" cy="12" r="10" />
+      <path d="M12 16v-4" />
+      <path d="M12 8h.01" />
+    </>,
+    FileText: <>
+      <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+      <polyline points="14 2 14 8 20 8" />
+      <line x1="16" y1="13" x2="8" y2="13" />
+      <line x1="16" y1="17" x2="8" y2="17" />
+      <line x1="10" y1="9" x2="8" y2="9" />
+    </>,
+    User: <>
+      <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+      <circle cx="12" cy="7" r="4" />
+    </>,
+    Users: <>
+      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    </>,
+    UsersThree: <>
+      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+      <circle cx="18" cy="8" r="3" />
+    </>,
+    Activity: <>
+      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+    </>,
+    Stethoscope: <>
+      <path d="M4.8 2.3A.3.3 0 1 0 5 2H4a2 2 0 0 0-2 2v5a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6V4a2 2 0 0 0-2-2h-1a.2.2 0 1 0 .3.3" />
+      <path d="M8 15v1a6 6 0 0 0 6 6h2a6 6 0 0 0 6 6v-4" />
+      <circle cx="20" cy="9" r="2" />
+    </>,
+    Baby: <>
+      <path d="M9 12h.01" />
+      <path d="M15 12h.01" />
+      <path d="M10 16c.5.3 1.2.5 2 .5s1.5-.2 2-.5" />
+      <path d="M19 6.3a9 9 0 0 1 1.8 3.9 2 2 0 0 1 0 3.6 9 9 0 0 1-17.6 0 2 2 0 0 1 0-3.6A9 9 0 0 1 12 3c2 0 3.5.7 4.8 2" />
+      <path d="M12 18.5c.8 0 1.5-.5 1.5-1.3s-.7-1.3-1.5-1.3-1.5.5-1.5 1.3.7 1.3 1.5 1.3Z" />
+    </>,
+    Parenting: <>
+      <circle cx="9" cy="7" r="4" />
+      <path d="M12 15h-6a4 4 0 0 0-4 4v2" />
+      <circle cx="17" cy="13" r="3" />
+      <path d="M14 21v-1a3 3 0 0 1 3-3h2" />
+    </>,
+    Calendar: <>
+      <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+      <line x1="16" y1="2" x2="16" y2="6" />
+      <line x1="8" y1="2" x2="8" y2="6" />
+      <line x1="3" y1="10" x2="21" y2="10" />
+    </>,
+    Heart: <>
+      <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+    </>,
+    Search: <>
+      <circle cx="11" cy="11" r="8" />
+      <line x1="21" y1="21" x2="16.65" y2="16.65" />
+    </>,
+    BookOpen: <>
+      <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+      <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+    </>,
+    ClipboardCheck: <>
+      <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+      <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+      <path d="m9 14 2 2 4-4" />
+    </> ,
+    ClipboardList: <>
+      <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+      <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+      <path d="M12 11h4" />
+      <path d="M12 16h4" />
+      <path d="M8 11h.01" />
+      <path d="M8 16h.01" />
+    </>,
+    Female: <>
+      <circle cx="12" cy="8" r="5" />
+      <path d="M12 13v9" />
+      <path d="M9 18h6" />
+    </>,
+    LayoutDashboard: <>
+      <rect x="3" y="3" width="7" height="7" />
+      <rect x="14" y="3" width="7" height="7" />
+      <rect x="14" y="14" width="7" height="7" />
+      <rect x="3" y="14" width="7" height="7" />
+    </>,
+    Smile: <>
+      <circle cx="12" cy="12" r="10" />
+      <path d="M8 14s1.5 2 4 2 4-2 4-2" />
+      <line x1="9" y1="9" x2="9.01" y2="9" />
+      <line x1="15" y1="9" x2="15.01" y2="9" />
+    </>,
+    Dentist: <>
+      <path d="M7 3C5 3 3 5 3 9C3 13 4 16 6 18C6.5 18.5 7 21 8 21C9 21 9.5 20 10 19C10.5 18 11.5 18 12 18C12.5 18 13.5 18 14 19C14.5 20 15 21 16 21C17 21 17.5 18.5 18 18C20 16 21 13 21 9C21 5 19 3 17 3C15 3 13 4 12 6C11 4 9 3 7 3Z" />
+    </>,
+    DentalDrill: <>
+      <path d="M10 2L2 22" />
+      <path d="M8 4l4-1 2 2-4 1-2-2z" />
+      <path d="M15 4l4-2" />
+      <circle cx="19" cy="2" r="1" />
+    </>,
+    Toothbrush: <>
+      <path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L7 20l-4 1 1-4Z" />
+      <path d="m15 5 3 3" />
+      <path d="m13 7 3 3" />
+      <path d="m11 9 3 3" />
+    </>,
+    School: <>
+      <path d="M14 22v-4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v4" />
+      <path d="M18 22V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v18" />
+      <path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2" />
+      <path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2" />
+      <path d="M10 6h4" />
+      <path d="M10 10h4" />
+      <path d="M10 14h4" />
+    </>,
+    SurgicalInstrument: <>
+      <path d="M2 3v18" />
+      <path d="M22 3v18" />
+      <path d="m6 13 4-2" />
+      <path d="m14 11 4 2" />
+      <path d="m18 19-6-8-6 8" />
+      <path d="M12 11V3" />
+      <circle cx="6" cy="19" r="2" />
+      <circle cx="18" cy="19" r="2" />
+    </>,
+    Calculator: <>
+      <rect x="4" y="2" width="16" height="20" rx="2" />
+      <line x1="8" y1="6" x2="16" y2="6" />
+      <line x1="16" y1="14" x2="16" y2="14.01" />
+      <line x1="12" y1="14" x2="12" y2="14.01" />
+      <line x1="8" y1="14" x2="8" y2="14.01" />
+      <line x1="16" y1="18" x2="16" y2="18.01" />
+      <line x1="12" y1="18" x2="12" y2="18.01" />
+      <line x1="8" y1="18" x2="8" y2="18.01" />
+    </>,
+    Code: <>
+      <polyline points="16 18 22 12 16 6" />
+      <polyline points="8 6 2 12 8 18" />
+    </>,
+    Briefcase: <>
+      <rect x="2" y="7" width="20" height="14" rx="2" />
+      <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+    </>,
+    X: <>
+      <line x1="18" y1="6" x2="6" y2="18" />
+      <line x1="6" y1="6" x2="18" y2="18" />
+    </>,
+    ExternalLink: <>
+      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+      <polyline points="15 3 21 3 21 9" />
+      <line x1="10" y1="14" x2="21" y2="3" />
+    </>,
+    CheckCircle: <>
+      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+      <polyline points="22 4 12 14.01 9 11.01" />
+    </>
+  };
+
+  return (
+    <svg 
+      xmlns="http://www.w3.org/2000/svg" 
+      viewBox="0 0 24 24" 
+      fill="none" 
+      stroke="currentColor" 
+      strokeWidth="2" 
+      strokeLinecap="round" 
+      strokeLinejoin="round" 
+      className={className}
+    >
+      {icons[name] || null}
+    </svg>
+  );
+};
+
+const cbosDentistas = [
+  '2232-08 - Cirurgião-Dentista Clínico Geral',
+  '2232-93 - Cirurgião-Dentista da Estratégia Saúde da Família',
+  '2232-72 - Cirurgião-Dentista de Saúde Coletiva'
+];
+
+const cbosEMulti = [
+  '5153-05 - Arte Educador',
+  '2516-05 - Assistente social',
+  '2234-45 - Farmacêutico(a) hospitalar e clínico',
+  '2234-05 - Farmacêutico',
+  '2236-05 - Fisioterapeuta',
+  '2238-10 - Fonoaudiólogo(a)',
+  '2251-05 - Médico(a) acupunturista',
+  '2251-20 - Médico(a) cardiologista',
+  '2251-35 - Médico(a) dermatologista',
+  '2251-55 - Médico(a) endocrinologista',
+  '2251-80 - Médico(a) geriatra',
+  '2252-50 - Médico(a) ginecologista / obstetra',
+  '2251-35 - Médico(a) hansenologista',
+  '2251-95 - Médico(a) homeopata',
+  '2251-03 - Médico(a) infectologista',
+  '2251-24 - Médico(a) pediatra',
+  '2251-33 - Médico(a) psiquiatra',
+  '2233-05 - Médico(a) veterinário(a)',
+  '2237-10 - Nutricionista',
+  '2241-40 - Profissional de educação física na saúde',
+  '2515-10 - Psicólogo(a)',
+  '1312-25 - Sanitarista',
+  '2239-05 - Terapeuta ocupacional'
+];
+
+const indicators = [
+  // --- CATEGORIA C: SAÚDE DA FAMÍLIA ---
+  {
+    id: 'C1',
+    category: 'Saúde da Família',
+    title: 'Mais Acesso à APS',
+    iconName: 'Calendar',
+    color: 'bg-blue-600',
+    description: 'Verifica o percentual de acesso de demanda programada em relação ao total de demandas (espontânea e programada).',
+    objective: 'Avaliar o acesso e monitoramento efetivo das demandas programadas e variações geográficas e temporais.',
+    formula: '(Nº de atendimentos de demanda programada / Total de atendimentos) * 100',
+    cbos: [
+      '2251-42 - Médico da Estratégia de Saúde da Família',
+      '2251-70 - Médico Generalista',
+      '2251-30 - Médico de Família e Comunidade',
+      '2235-65 - Enfermeiro da Estratégia de Saúde da Família',
+      '2235-05 - Enfermeiro'
+    ],
+    codes: { ciap2: ['Geral'], cid10: ['Geral'] },
+    sigtap: ['Geral'],
+    registration: `• Pacientes de Demanda Espontânea: Realizar recepção pela Lista de Atendimento.
+• Pacientes de Demanda Agendada: Realizar recepção pela Agenda.`,
+    keywords: ['Acesso Efetivo', 'Controle de Acesso'],
+    concepts: [
+      { 
+        term: 'Demanda programada', 
+        definition: 'Consiste no atendimento à pessoa com necessidade de ações programáticas individuais, direcionadas para os ciclos de vida, doenças e agravos prioritários e que necessitam de acompanhamento contínuo (consulta agendada programada; cuidado continuado; e consulta agendada).' 
+      },
+      { 
+        term: 'Demanda espontânea', 
+        definition: 'Consiste no atendimento à pessoa com necessidade de saúde que exige atenção imediata, no mesmo dia, sem consulta previamente agendada (escuta inicial/ orientação; consulta no dia; e atendimento de urgência). Essa necessidade se refere a um quadro de sofrimento agudo, com evolução de risco ou potencialidade de prevenção.' 
+      }
+    ]
+  },
+  {
+    id: 'C2',
+    category: 'Saúde da Família',
+    title: 'Desenvolvimento Infantil',
+    iconName: 'Baby',
+    color: 'bg-green-600',
+    description: 'Avalia o acesso e monitoramento das crianças até dois anos de idade.',
+    formula: '(Somatório de Boas Práticas / Nº total de crianças com até 02 anos vinculadas à equipe no período.) * 100',
+    goodPractices: [
+      "(A) Ter a 1ª consulta presencial realizada por médica(o) ou enfermeira(o), até o 30º dia de vida - 20 pontos;",
+      "(B) Ter pelo menos 09 consultas presenciais ou remotas realizadas por médica(o) ou enfermeira(o) até dois anos de vida - 20 pontos;",
+      "(C) Ter pelo menos 09 registros simultâneos de peso e altura até os dois anos de vida - 20 pontos;",
+      "(D) Ter pelo menos 02 visitas domiciliares realizadas por ACS/TACS, sendo a primeira até os primeiros 30 dias de vida e a segunda até os 06 meses de vida - 20 pontos;",
+      "(E) Ter vacinas contra difteria, tétano, coqueluche, hepatite B, infecções causadas por Haemophilus influenzae tipo b, poliomielite, sarampo, caxumba e rubéola, pneumocócica, registradas com todas as doses recomendadas - 20 pontos;"
+    ],
+    cbos: [
+      'BOA PRÁTICA A e B (Consulta): Médicos (2251, 2252, 2253, 2231) e Enfermeiros (2235)',
+      'BOA PRÁTICA C (Peso/Altura): Médicos (2251, 2252, 2253, 2231) e Enfermeiros (2235), Técnicos/Auxiliares de Enfermagem/TACS (3222) e ACS (5151-05)',
+      'BOA PRÁTICA D (Visita): TACS (3222-55) e ACS (5151-05)',
+      'BOA PRÁTICA E (Vacina): Qualquer profissional de saúde'
+    ],
+    codes: { ciap2: ['Geral'], cid10: ['Geral'] },
+    sigtap: [
+      '01.01.04.002-4 - Avaliação antropométrica',
+      '01.01.04.008-3 - Medição de peso',
+      '01.01.04.007-5 - Medição de altura',
+      '03.01.01.026-9 - Avaliação do crescimento na puericultura',
+      '03.01.01.027-7 - Avaliação do desenvolvimento da criança na puericultura',
+      '03.01.01.025-0 - Teleconsulta na atenção primária'
+    ],
+    registration: `• No Prontuário do paciente, registrar CID10 ou CIAP2 condizente com a consulta realizada.
+• Registrar Peso e Altura nos campos específicos, no Objetivo.
+• Procedimentos de consulta, registrar em "Procedimentos Administrativos".
+• Para a boa prática de visita, registrar como visita de "Acompanhamento" da Criança ou Recém-Nascido.`,
+    objective: 'Incentivar a captação precoce e o acompanhamento nos primeiros dois anos de vida.',
+    keywords: ['Saúde da Criança', 'Puericultura'],
+    concepts: [{ term: 'Puericultura', definition: 'conjunto de ações voltadas à vigilância do crescimento e desenvolvimento para promoção da atenção integral à saúde da criança.' }]
+  },
+  {
+    id: 'C3',
+    category: 'Saúde da Família',
+    title: 'Gestação e Puerpério',
+    iconName: 'Parenting',
+    color: 'bg-pink-600',
+    description: 'Avalia o acesso e monitoramento efetivo durante a gestação e o período pós-parto.',
+    formula: '(Somatório de Boas Práticas / Nº total de gestantes e puérperas vinculadas à equipe no período) * 100',
+    goodPractices: [
+      "(A) Ter a 1ª consulta presencial ou remota realizada por médica(o) ou enfermeira(o), até a 12ª semana de gestação - 10 pontos",
+      "(B) Ter pelo menos 07 consultas semestrais ou remotas realizadas por médica(o) ou enfermeira(o) durante o período da gestação - 9 pontos",
+      "(C) Ter pelo menos 07 registro de aferição de pressão arterial realizados durante o período da gestação - 9 pontos",
+      "(D) Ter pelo menos 07 registros simultâneos de peso e altura durante o período da gestação - 9 pontos",
+      "(E) Ter pelo menos 03 visitas domiciliares realizadas por ACS/TACS, após a primeira consulta do pré-natal - 9 pontos",
+      "(F) Ter vacina acelular contra difteria, tétano, coqueluche (dTpa) registrada a partir da 20ª semana de cada gestação - 9 pontos",
+      "(G) Ter registro dos testes rápidos ou dos exames avaliados para silfilis, HIV e hepatites B e C realizados no 1º trimestre de cada gestação - 9 pontos",
+      "(H) Ter registro dos testes rápidos ou dos exames avaliados para silfilis e HIV realizados no 3º trimestre de cada gestação - 9 pontos",
+      "(I) Ter pelo menos 01 registro de consulta presencial ou remota realizada por médica(o) ou enfermeira(o) durante o puerpério - 9 pontos",
+      "(J) Ter pelo menos 01 visita domiciliar realizada por ACS/TACS durante o puerpério - 9 pontos",
+      "(K) Ter pelo menos 01 atividade em saúde bucal realizada por cirurgiã(ão) dentista ou técnica(o) de saúde bucal durante o período da gestação - 9 pontos"
+    ],
+    cbos: [
+      'BOA PRÁTICA A, B e I (Consulta): Médicos (2251, 2252, 2253, 2231) e Enfermeiros (2235)',
+      'BOA PRÁTICA C (Aferição de PA): Médicos (2251, 2252, 2253, 2231), Enfermeiros (2235) e Técnico ou Auxiliar de Enfermagem e/ou TACS (3222)',
+      'BOA PRÁTICA D (Peso/Altura): Médicos (2251, 2252, 2253, 2231), Enfermeiros (2235), Técnico ou Auxiliar de Enfermagem e/ou TACS (3222) e ACS (5151-05)',
+      'BOA PRÁTICA E e J (Visita): TACS (3222-55) e ACS (5151-05)',
+      'BOA PRÁTICA F (Vacina): Qualquer profissional de saúde',
+      'BOA PRÁTICA G e H (Testes Rápidos): Médicos (2251, 2252, 2253, 2231) e Enfermeiros (2235)',
+      'BOA PRÁTICA K (Saúde Bucal): Cirurgiões Dentistas (2232) e TSB (3224)'
+    ],
+    codes: { 
+      ciap2: ['W78', 'W79', 'W81', 'W84', 'W85'], 
+      cid10: [
+        'O11', 'O12.0', 'O12.1', 'O12.2', 'O13', 'O14.0', 'O14.1', 'O14.9', 'O15.0', 'O15.1', 'O15.9', 'O16', 
+        'O20.0', 'O20.8', 'O20.9', 'O21.0', 'O21.1', 'O21.2', 'O21.8', 'O21.9', 'O22.0', 'O22.1', 'O22.2', 'O22.3', 
+        'O22.4', 'O22.5', 'O22.8', 'O22.9', 'O23.0', 'O23.1', 'O23.2', 'O23.3', 'O23.4', 'O23.5', 'O23.9', 'O29.9', 
+        'O30.0', 'O30.1', 'O30.2', 'O30.8', 'O30.9', 'O31.1', 'O31.2', 'O31.8', 'O32.0', 'O32.1', 'O32.2', 'O32.3', 
+        'O32.4', 'O32.5', 'O32.6', 'O32.8', 'O32.9', 'O33.0', 'O33.1', 'O33.2', 'O33.3', 'O33.4', 'O33.5', 'O33.6', 
+        'O33.7', 'O33.8', 'O75.2', 'O75.3', 'O99.0', 'O99.1', 'O99.2', 'O99.3', 'O99.4', 'O24.0', 'O24.1', 'O24.2', 
+        'O24.3', 'O24.4', 'O24.9', 'O25', 'O26.0', 'O26.1', 'O26.3', 'O26.4', 'O26.5', 'O26.8', 'O26.9', 'O28.0', 
+        'O28.1', 'O28.2', 'O28.3', 'O28.4', 'O28.5', 'O28.8', 'O28.9', 'O29.0', 'O29.1', 'O29.2', 'O29.3', 'O29.4', 
+        'O29.5', 'O29.6', 'O29.8', 'O33.9', 'O34.0', 'O34.1', 'O34.2', 'O34.3', 'O34.4', 'O34.5', 'O34.6', 'O34.7', 
+        'O34.8', 'O34.9', 'O35.0', 'O35.1', 'O35.2', 'O35.3', 'O35.4', 'O35.5', 'O35.6', 'O35.7', 'O35.8', 'O35.9', 
+        'O36.0', 'O36.1', 'O36.2', 'O36.3', 'O36.5', 'O36.6', 'O36.7', 'O36.8', 'O36.9', 'O40', 'O41.0', 'O41.1', 
+        'O41.8', 'O41.9', 'O43.0', 'O43.1', 'O43.8', 'O43.9', 'O44.0', 'O44.1', 'O46.0', 'O46.8', 'O46.9', 'O47.0', 
+        'O47.1', 'O47.9', 'O48', 'O99.5', 'O99.6', 'O99.7', 'Z64.0', 'O10', 'O12', 'O14', 'O15', 'O20', 'O21', 
+        'O22', 'O23', 'O24', 'O26', 'O28', 'O29', 'O30', 'O31', 'O32', 'O33', 'O34', 'O35', 'O36', 'O41', 'O43', 
+        'O44', 'O46', 'O47', 'O98', 'Z34', 'Z35', 'Z36', 'Z32.1', 'Z33', 'Z34.0', 'Z34.8', 'Z34.9', 'Z35.0', 
+        'Z35.1', 'Z35.2', 'Z35.3', 'Z35.4', 'Z35.7', 'Z35.8', 'Z35.9'
+      ] 
+    },
+    sigtap: [
+      '01.01.04.002-4 - Avaliação antropométrica',
+      '01.01.04.008-3 - Medição de peso',
+      '01.01.04.007-5 - Medição de altura',
+      '03.01.10.003-9 - Aferição da pressão arterial',
+      '03.01.01.003-0 - Consulta de profissionais de nível superior na atenção primária (exceto médico)',
+      '03.01.01.006-4 - Consulta médica em atenção primária',
+      '03.01.01.011-0 - Consulta pré-natal',
+      '03.01.01.012-9 - Consulta puerperal',
+      '03.01.01.013-7 - Consulta/atendimento domiciliar',
+      '03.01.01.025-0 - Teleconsulta na atenção primária',
+      '02.14.01.004-0 - Teste rápido para detecção de HIV na gestante ou pai/parceiro',
+      '02.14.01.027-9 - teste rápido para detecção de anticorpos anti-HIV em gestante',
+      '02.14.01.005-8 - Teste rápido para detecção de infecção pelo HIV',
+      '02.14.01.007-4 - Teste rápido para sífilis',
+      '02.14.01.008-2 - Teste rápido para sífilis na gestante ou pai/parceiro',
+      '02.14.01.025-2 - Teste rápido treponêmico (sífilis) em gestante',
+      '02.14.01.009-0 - Teste rápido para detecção de hepatite C',
+      '02.14.01.030-9 - Teste rápido para detecção de anticorpos contra o vírus da hepatite C em gestante.',
+      '02.14.01.010-4 - Teste rápido para detecção de infecção pelo HBV',
+      '02.14.01.023-6 - teste rápido para detecção do antígeno de superfície do vírus da hepatite B-HBV (HBSAG) em gestante.',
+      '02.13.01.078-0 - Detecção rápida da carga viral do HIV',
+      '02.13.01.050-0 - Quantificação da carga viral do HIV (RNA)',
+      '02.02.03.109-8 - Teste treponêmico para detecção de sífilis',
+      '02.02.03.111-0 - Teste não treponêmico para detecção de sífilis',
+      '02.02.03.117-9 - Teste não treponêmico para detecção de sífilis em gestante',
+      '02.02.03.078-4 - Pesquisa de anticorpos IgG e IgM contra o antígeno central do vírus da hepatite B (anti-HBC total)',
+      '02.02.03.097-0 - Pesquisa de antígeno de superfície do vírus da hepatite B (HBsAG)',
+      '02.13.01.020-8 - Identificação do vírus da hepatite B por PCR (quantitativo)',
+      '02.02.03.005-9 - Detecção de RNA do vírus da hepatite C (qualitativo)',
+      '02.02.03.067-9 - Pesquisa de anticorpos contra o vírus da hepatite C (anti-HCV)'
+    ],
+    registration: `• No Prontuário da paciente, registrar CID10 ou CIAP2 válido, na Avaliação do SOAP.
+• Registrar Peso, Altura e Aferição de PA nos campos específicos, no Objetivo. É obrigatório registrar a DUM na consulta, para cálculo da DPP.
+• Conferir os procedimentos registrados no Objetivo no campo "Procedimentos Clínicos". Lançar, neste campo, testes rápidos e outros procedimentos realizados.
+• Procedimentos de consulta, registrar em "Procedimentos Administrativos".
+• Para a boa prática de visita, registrar como visita de "Acompanhamento" da Gestante ou Puérpera.
+• Realizar e Registrar a consulta odontológica somente após a primeira consulta de Pré-natal.`,
+    objective: 'Garantir a captação precoce das gestantes e a continuidade do cuidado no puerpério.',
+    keywords: ['Gestante', 'Pré-natal', 'Puerpério'],
+    concepts: [
+      { term: 'Captação precoce', definition: 'Início do pré-natal até a 12ª semana de gestação.' },
+      { term: 'Data da Última Menstruação (DUM)', definition: 'Parâmetro utilizado para cálculo da idade gestacional.' },
+      { term: 'Data provável do parto (DPP)', definition: 'Data prevista para o nascimento do bebê.' },
+      { term: 'Puerpério', definition: 'Período que ocorre logo após o parto e vai até 42 dias.' }
+    ]
+  },
+  {
+    id: 'C4',
+    category: 'Saúde da Família',
+    title: 'Cuidado da Pessoa com Diabetes',
+    iconName: 'Activity',
+    color: 'bg-orange-600',
+    description: 'Monitora a atenção integral e longitudinal de pessoas diagnosticadas com diabetes.',
+    formula: '(Somatório de Boas Práticas / Nº total de pessoas com diabetes vinculadas à equipe no período) * 100',
+    goodPractices: [
+      "(A) Ter pelo menos 01 consulta presencial ou remota realizadas por médica(o) ou enfermeira(o), nos últimos 06 (seis) meses - 20 pontos",
+      "(B) Ter pelo menos 01 registro de aferição de pressão arterial realizado nos últimos 06 meses - 15 pontos",
+      "(C) Ter pelo menos 01 registro simultâneos de peso e altura realizado nos últimos 12 meses - 15 pontos",
+      "(D) Ter pelo menos 02 visitas domiciliares realizadas por ACS/TACS, com intervalo mínimo de 30 dias, nos últimos 12 meses - 20 pontos",
+      "(E) Ter pelo menos 01 registro de solicitação de hemoglobina glicada realizada ou avaliada, nos últimos 12 meses - 15 pontos",
+      "(F) Ter pelo menos 01 avaliação dos pés realizada nos últimos 12 meses - 15 pontos"
+    ],
+    cbos: [
+      'BOA PRÁTICA A (Consulta): Médicos (2251, 2252, 2253, 2231) e Enfermeiros (2235)',
+      'BOA PRÁTICA B (Aferição de PA): Médicos (2251, 2252, 2253, 2231), Enfermeiros (2235) e Técnico ou Auxiliar de Enfermagem e/ou TACS (3222)',
+      'BOA PRÁTICA C (Peso/Altura): Médicos (2251, 2252, 2253, 2231), Enfermeiros (2235), Técnico ou Auxiliar de Enfermagem e/ou TACS (3222) e ACS (5151-05)',
+      'BOA PRÁTICA D (Visita): TACS (3222-55) e ACS (5151-05)',
+      'BOA PRÁTICA E (Hemoblobina Glicada): Médicos (2251, 2252, 2253, 2231), Enfermeiros (2235), Técnico ou Auxiliar de Enfermagem e/ou TACS (3222), Cirurgiões Dentistas (2232) e Nutricionista (2237)',
+      'BOA PRÁTICA F (Pé Diabético): Médicos (2251, 2252, 2253, 2231), Enfermeiros (2235), Farmacêutico (2234), Fisioterapeuta (2236) e Terapeuta Ocupacional (2239)'
+    ],
+    codes: { 
+      ciap2: ['T89', 'T90'], 
+      cid10: [
+        'E10.0', 'E10.1', 'E10.2', 'E10.3', 'E10.4', 'E10.5', 'E10.6', 'E10.7', 'E10.8', 'E10.9', 
+        'E11', 'E11.0', 'E11.1', 'E11.2', 'E11.3', 'E11.4', 'E11.5', 'E11.6', 'E11.7', 'E11.8', 'E11.9', 
+        'E14', 'E14.0', 'E14.1', 'E14.2', 'E14.3', 'E14.4', 'E14.5', 'E14.6', 'E14.7', 'E14.8', 'E14.9'
+      ] 
+    },
+    sigtap: [
+      '01.01.04.002-4 - Avaliação antropométrica',
+      '01.01.04.008-3 - Medição de peso',
+      '01.01.04.007-5 - Medição de altura',
+      '03.01.10.003-9 - Aferição da pressão arterial',
+      '03.01.01.003-0 - Consulta de profissionais de nível superior na atenção primária (exceto médico)',
+      '03.01.01.006-4 - Consulta médica em atenção primária',
+      '03.01.01.025-0 - Teleconsulta na atenção primária',
+      '03.01.04.009-5 - Exame do pé diabético',
+      '02.02.01.050-3 - Dosagem de hemoglobina glicosilada'
+    ],
+    registration: `• No Prontuário da paciente, registrar CID10 ou CIAP2 válido, na Avaliação do SOAP.
+• Registrar Peso, Altura e Aferição de PA nos campos específicos, no Objetivo.
+• Se solicitação de exame de Hemoglobina Glicada, registrar o pedido no Plano do SOAP, em "Solicitação de Exames/Procedimentos". Se avaliação do resultado, registrar no Objetivo em "Resultados de exames".
+• Conferir os procedimentos registrados no Objetivo no campo "Procedimentos Clínicos". Lançar neste campo o procedimento de "avaliação dos pés".
+• Procedimentos de consulta, registrar em "Procedimentos Administrativos".
+• Para a boa prática de visita, registrar como visita de "Acompanhamento" do Diabético.`,
+    objective: 'Incentivar boas práticas clínicas e acompanhamento contínuo.',
+    keywords: ['Diabetes', 'Condições Crônicas'],
+    concepts: [
+      { 
+        term: 'Pessoa com diabetes', 
+        definition: 'pessoa identificada a partir de atendimento individual with a condição avaliada de diabetes, realizada por enfermeira(o) e/ou médica(o) da APS, no Modelo de Informação de Atendimento Individual (MIAI), em pelo menos uma ocasião desde 2013.' 
+      }
+    ]
+  },
+  {
+    id: 'C5',
+    category: 'Saúde da Família',
+    title: 'Cuidado da Pessoa com Hipertensão',
+    iconName: 'Heart',
+    color: 'bg-red-600',
+    description: 'Avalia o acompanhamento sistemático de pessoas com hipertensão arterial.',
+    formula: '(Somatório de Boas Práticas / Nº total de pessoas com hipertensão vinculadas à equipe no período) * 100',
+    goodPractices: [
+      "(A) Ter pelo menos 01 consulta presencial ou remota realizadas por médica(o) ou enfermeira(o), nos últimos 06 meses - 25 pontos",
+      "(B) Ter pelo menos 01 registro de aferição de pressão arterial realizado nos últimos 06 meses - 25 pontos",
+      "(C) Ter pelo menos 01 registro simultâneos de peso e altura realizado nos últimos 12 meses - 25 pontos",
+      "(D) Ter pelo menos 02 visitas domiciliares realizadas por ACS/TACS, com intervalo mínimo de 30 dias, nos últimos 12 meses - 25 pontos"
+    ],
+    cbos: [
+      'BOA PRÁTICA A (Consulta): Médicos (2251, 2252, 2253, 2231) e Enfermeiros (2235)',
+      'BOA PRÁTICA B (Aferição de PA): Médicos (2251, 2252, 2253, 2231), Enfermeiros (2235) e Técnico ou Auxiliar de Enfermagem e/ou TACS (3222)',
+      'BOA PRÁTICA C (Peso/Altura): Médicos (2251, 2252, 2253, 2231), Enfermeiros (2235), Técnico ou Auxiliar de Enfermagem e/ou TACS (3222) e ACS (5151-05)',
+      'BOA PRÁTICA D (Visita): TACS (3222-55) e ACS (5151-05)'
+    ],
+    codes: { 
+      ciap2: ['K86', 'K87'], 
+      cid10: [
+        'I10', 'I11', 'I11.0', 'I11.9', 'I12', 'I12.0', 'I12.9', 'I13', 'I13.0', 'I13.1', 'I13.2', 'I13.9', 
+        'I15', 'I15.0', 'I15.1', 'I15.2', 'I15.8', 'I15.9', 'O10', 'O10.0', 'O10.1', 'O10.2', 'O10.3', 
+        'O10.4', 'O10.9', 'O11'
+      ] 
+    },
+    sigtap: [
+      '01.01.04.002-4 - Avaliação antropométrica',
+      '01.01.04.008-3 - Medição de peso',
+      '01.01.04.007-5 - Medição de altura',
+      '03.01.10.003-9 - Aferição da pressão arterial',
+      '03.01.01.003-0 - Consulta de profissionais de nível superior na atenção primária (exceto médico)',
+      '03.01.01.006-4 - Consulta médica em atenção primária',
+      '03.01.01.025-0 - Teleconsulta na atenção primária'
+    ],
+    registration: `• No Prontuário da paciente, registrar CID10 ou CIAP2 válido, na Avaliação do SOAP.
+• Registrar Peso, Altura e Aferição de PA nos campos específicos, no Objetivo.
+• Conferir os procedimentos registrados no Objetivo no campo "Procedimentos Clínicos".
+• Procedimentos de consulta, registrar em "Procedimentos Administrativos".
+• Para a boa prática de visita, registrar como visita de "Acompanhamento" do Hipertenso.`,
+    objective: 'Garantir o monitoramento efetivo e o controle pressórico.',
+    keywords: ['Hipertensão', 'Saúde Cardiovascular'],
+    concepts: [
+      { 
+        term: 'Pessoa com hipertensão', 
+        definition: 'Pessoa identificada a partir de atendimento individual with a condição avaliada de hipertensão, realizada por enfermeira(o) e/ou médica(o) da APS, no Modelo de Informação de Atendimento Individual (MIAI), em pelo menos uma ocasião desde 2013.' 
+      }
+    ]
+  },
+  {
+    id: 'C6',
+    category: 'Saúde da Família',
+    title: 'Cuidado da Pessoa Idosa',
+    iconName: 'Stethoscope',
+    color: 'bg-purple-600',
+    description: 'Acompanhamento integral da population com 60 anos ou mais na APS.',
+    formula: '(Somatório das boas práticas pontuadas para cada pessoa idosa durante o acompanhamento. / Nº total de pessoas idosas com 60 anos ou mais de vida vinculadas à equipe no período) * 100',
+    goodPractices: [
+      "(A) Ter realizado pelo menos 01 consulta por profissional médica (o) ou enfermeira (o) presencial ou remota nos últimos 12 meses - 25 pontos",
+      "(B) Ter realizado pelo menos 01 registro simultâneo (no mesmo dia) de peso e altura para avaliação antropométrica nos últimos 12 meses - 25 pontos",
+      "(C) Ter pelo menos 02 visitas domiciliares realizadas por ACS/TACS, com intervalo mínimo de 30 dias entre as visitas, realizadas nos últimos 12 meses - 25 pontos",
+      "(D) Ter registro de 1 dose da vacina contra influenza realizada nos últimos 12 meses - 25 pontos"
+    ],
+    cbos: [
+      'BOA PRÁTICA A (Consulta): Médicos (2251, 2252, 2253, 2231) e Enfermeiros (2235)',
+      'BOA PRÁTICA B (Peso/Altura): Médicos (2251, 2252, 2253, 2231), Enfermeiros (2235), Técnico ou Auxiliar de Enfermagem e/ou TACS (3222) e ACS (5151-05)',
+      'BOA PRÁTICA C (Visita): TACS (3222-55) e ACS (5151-05)',
+      'BOA PRÁTICA D (Vacina): Qualquer profissional de saúde'
+    ],
+    codes: { ciap2: ['Geral'], cid10: ['Geral'] },
+    sigtap: [
+      '01.01.04.002-4 - Avaliação antropométrica',
+      '01.01.04.008-3 - Medição de peso',
+      '01.01.04.007-5 - Medição de altura',
+      '03.01.01.003-0 - Consulta de profissionais de nível superior na atenção primária (exceto médico)',
+      '03.01.01.006-4 - Consulta médica em atenção primária',
+      '03.01.01.025-0 - Teleconsulta na atenção primária'
+    ],
+    registration: `• No Prontuário da paciente, registrar CID10 ou CIAP2 de acordo com atendimento realizado.
+• Registrar Peso e Altura nos campos específicos, no Objetivo.
+• Conferir os procedimentos registrados no Objetivo no campo "Procedimentos Clínicos".
+• Procedimentos de consulta, registrar em "Procedimentos Administrativos".
+• Para a boa prática de visita, registrar como visita de "Acompanhamento" do Idoso.`,
+    objective: 'Avaliar o acesso e monitoramento do cuidado integral à saúde das pessoas idosas.',
+    keywords: ['Idoso', 'Envelhecimento Ativo'],
+    concepts: [{ term: 'Pessoa Idosa', definition: 'Indivíduos com idade igual ou superior a 60 anos de vida.' }]
+  },
+  {
+    id: 'C7',
+    category: 'Saúde da Família',
+    title: 'Cuidado da Mulher na Prevenção do Câncer',
+    iconName: 'Female',
+    color: 'bg-yellow-500',
+    description: 'Monitoramento da atenção integral e do cuidado longitudinal de mulheres e homens transgênero na prevenção do câncer.',
+    formula: `(Somatório da boa prática para cada mulher e homem transgênero na faixa etária avaliada na boa prática / Nº total de mulheres e homens transgênero na faixa etária avaliada na boa prática e vinculadas à equipe no período)
+* Fórmula do Indicador: (A+B+C+D) x 100.
+* Fórmulas por cada boa prática:
+Boa prática (A)= (a/b) x 20
+a = Pelo menos 01 exame de rastreamento para câncer do colo de útero, coletado, solicitado ou avaliado nos últimos 36 meses.
+b = Mulheres e homens transgênero entre 25 e 64 anos, vinculadas à equipe.
+Boa prática (B)= (c/d) x 30
+c = Registro de pelo menos uma dose da vacina HPV administrada nessa faixa etária.
+d = Crianças e adolescentes do sexo feminino entre 09 e 14 anos, vinculadas à equipe.
+
+Boa prática (C)=(e/f) x 30
+e= Registro de atendimentos presenciais ou remotos de atenção à saúde sexual e reprovutiva, realizado nos últimos 12 meses.
+f = Adolescentes do sexo feminino, mulheres e homens transgênero entre 14 e 69 anos, vinculadas à equipe.
+Boa prática (D)= (g/h) x 20
+g = Registro de pelo menos 01 exame de rastreamento para câncer de mama, solicitado ou avaliado nos últimos 24 meses.
+h = Mulheres e homens transgênero entre 50 e 69 anos, vinculadas à equipe.`,
+    goodPractices: [
+      "(A) Ter pelo menos 01 exame de rastreamento para câncer do colo do útero em mulheres e em homens transgênero de 25 a 64 anos de idade, coletado, solicitado ou avaliado nos últimos 36 meses - 20 pontos",
+      "(B) Ter pelo menos 01 dose da vacina HPV para crianças e adolescentes do sexo feminino de 09 a 14 anos de idade - 30 pontos",
+      "(C) Ter pelo menos 01 atendimento presencial ou remoto, para adolescentes, mulheres e homens transgênero de 14 a 69 anos de idade, sobre atenção à saúde sexual e reprovutiva, realizado nos últimos 12 meses - 30 pontos",
+      "(D) Ter registro de pelo menos 01 exame de rastreamento para câncer de mama em mulheres e em homens transgênero de 50 e 69 anos de idade, solicitado ou avaliado nos últimos 24 meses - 20 pontos"
+    ],
+    cbos: [
+      'BOA PRÁTICA A (Exame de Colo de Útero): Médicos (2251, 2252, 2253, 2231) e Enfermeiros (2235)',
+      'BOA PRÁTICA B (Vacina): Qualquer profissional de saúde',
+      'BOA PRÁTICA C (Consulta): Médicos (2251, 2252, 2253, 2231) e Enfermeiros (2235)',
+      'BOA PRÁTICA D (Mamografia): Médicos (2251, 2252, 2253, 2231) e Enfermeiros (2235)'
+    ],
+    codes: { 
+      ciap2: [
+        'B25', 'W02', 'W10', 'W11', 'W12', 'W13', 'W14', 'W15', 'W79', 'W82', 'X01', 'X02', 'X03', 'X04', 
+        'X05', 'X06', 'X07', 'X08', 'X09', 'X10', 'X11', 'X12', 'X13', 'X23', 'X24', 'X82', 'X89', 'Y14'
+      ], 
+      cid10: [
+        'N80', 'N800', 'N801', 'N802', 'N803', 'N804', 'N805', 'N806', 'N808', 'N809', 'N91', 'N910', 'N911', 
+        'N912', 'N913', 'N914', 'N915', 'N92', 'N920', 'N921', 'N922', 'N923', 'N924', 'N925', 'N926', 'N93', 
+        'N930', 'N938', 'N939', 'N94', 'N940', 'N941', 'N942', 'N943', 'N944', 'N945', 'N946', 'N948', 'N949', 
+        'N95', 'N950', 'N951', 'N952', 'N953', 'N958', 'N959', 'N96', 'N97', 'N970', 'N971', 'N972', 'N973', 
+        'N974', 'N978', 'N979', 'O03', 'O04', 'R102', 'T742', 'Y050', 'Y051', 'Y052', 'Y053', 'Y054', 'Y055', 
+        'Y056', 'Y057', 'Y058', 'Y059', 'Z123', 'Z124', 'Z205', 'Z206', 'Z30', 'Z300', 'Z301', 'Z302', 'Z303', 
+        'Z304', 'Z305', 'Z308', 'Z309', 'Z31', 'Z310', 'Z311', 'Z312', 'Z313', 'Z314', 'Z315', 'Z316', 'Z318', 
+        'Z319', 'Z320', 'Z600', 'Z630', 'Z640', 'Z70', 'Z700', 'Z701', 'Z702', 'Z703', 'Z708', 'Z709', 'Z717', 'Z725'
+      ] 
+    },
+    sigtap: [
+      '02.04.03.003-0 - Mamografia',
+      '02.04.03.018-8 - Mamografia bilateral para rastreamento',
+      '02.01.02.003-3 - Coleta de citopatológico de colo uterino',
+      '02.03.01.008-6 - Exame citopatológico cérvico vaginal/microflora-rastreamento',
+      '02.03.01.001-9 - Exame citopatológico cérvico-vaginal/microflora',
+      '02.01.02.007-6 - Coleta de material do colo do útero para exame molecular de detecção de HPV',
+      '02.01.02.008-4 - Entrega de material obtido por auto coleta para exame molecular para detecção de HPV, no colo do útero',
+      '03.01.01.003-0 - Consulta de profissionais de nível superior na atenção primária (exceto médico)',
+      '03.01.01.006-4 - Consulta médica em atenção primária',
+      '03.01.01.025-0 - Teleconsulta na atenção primária'
+    ],
+    registration: `• No Prontuário da paciente, registrar CID10 ou CIAP2 válido, na Avaliação do SOAP.
+• Registrar Peso, Altura e Aferição de PA nos campos específicos, no Objetivo. É obrigatório registrar a DUM na consulta, para cálculo da DPP.
+• Conferir os procedimentos registrados no Objetivo no campo "Procedimentos Clínicos". Lançar, neste campo, testes rápidos e outros procedimentos realizados.
+• Procedimentos de consulta, registrar em "Procedimentos Administrativos".
+• Para a boa prática de visita, registrar como visita de "Acompanhamento" da Gestante ou Puérpera.
+• Realizar e Registrar a consulta odontológica somente após a primeira consulta de Pré-natal.`,
+    objective: 'Garantir a captação precoce das gestantes e a continuidade do cuidado no puerpério.',
+    keywords: ['Gestante', 'Pré-natal', 'Puerpério'],
+    concepts: [
+      { term: 'Captação precoce', definition: 'Início do pré-natal até a 12ª semana de gestação.' },
+      { term: 'Data da Última Menstruação (DUM)', definition: 'Parâmetro utilizado para cálculo da idade gestacional.' },
+      { term: 'Data provável do parto (DPP)', definition: 'Data prevista para o nascimento do bebê.' },
+      { term: 'Puerpério', definition: 'Período que ocorre logo após o parto e vai até 42 dias.' }
+    ]
+  },
+
+  // --- CATEGORIA B: SAÚDE BUCAL ---
+  {
+    id: 'B1',
+    category: 'Saúde Bucal',
+    title: 'Primeira Consulta Programada',
+    iconName: 'Dentist',
+    color: 'bg-emerald-600',
+    description: 'Mensura o acesso da population à primeira consulta odontológica programática.',
+    formula: '(Nº total de pessoas com primeira consulta odontológica programática realizadas pela eSB / Nº total de pessoas vinculadas à eSF/eAP da eSB de referência) * 100',
+    cbos: cbosDentistas,
+    codes: { ciap2: ['Geral'], cid10: ['Geral'] },
+    sigtap: ['03.01.01.015-3 – PRIMEIRA CONSULTA ODONTOLÓGICA PROGRAMÁTICA'],
+    registration: "No prontuário do paciente, no campo “Tipo de consulta”, marcar a opção “Primeira consulta odontológica programática”.",
+    objective: 'Avaliar o acesso inicial e incentivar a captação precoce.',
+    keywords: ['Acesso Odonto', 'Primeira Consulta'],
+    concepts: [
+      { 
+        term: 'Primeira consulta odontológica programática', 
+        definition: 'Refere-se à consulta odontológica programada com base na avaliação das condições gerais de saúde e realização de exame clínico odontológico com finalidade de diagnóstico e, necessariamente, elaboração de um plano preventivo terapêutico, com registro das informações em prontuário do indivíduo.' 
+      }
+    ]
+  },
+  {
+    id: 'B2',
+    category: 'Saúde Bucal',
+    title: 'Tratamento Concluído',
+    iconName: 'CheckCircle',
+    color: 'bg-sky-500',
+    description: 'Avalia a resolutividade das ações de saúde bucal.',
+    formula: '(Nº total de pessoas com tratamento odontológico concluído pela eSB / Nº total de pessoas com primeira consulta odontológica programática realizadas pela eSB) * 100',
+    cbos: cbosDentistas,
+    codes: { ciap2: ['Geral'], cid10: ['Geral'] },
+    sigtap: ['03.01.01.015-3 – PRIMEIRA CONSULTA ODONTOLÓGICA PROGRAMÁTICA'],
+    registration: 'Ao finalizar o tratamento previsto no Plano Terapêutico do paciente, no prontuário, no campo "Conduta", marcar a opção “Tratamento concluído”.',
+    objective: 'Verificar a proporção de tratamentos concluídos.',
+    keywords: ['Resolutividade', 'Cuidado Integral'],
+    concepts: [
+      { 
+        term: 'Tratamento concluído', 
+        definition: 'Término da intervention odontológica planejada. O tratamento é considerado concluído quando o plano de tratamento inicial é cumprido, conforme planejamento descrito pela equipe de Saúde Bucal (eSB).' 
+      }
+    ]
+  },
+  {
+    id: 'B3',
+    category: 'Saúde Bucal',
+    title: 'Taxa de Exodontia',
+    iconName: 'SurgicalInstrument',
+    color: 'bg-pink-600',
+    description: 'Relação entre exodontias e o total de procedimentos individuais.',
+    formula: '(N° total de exodontias realizadas pelo cirurgião-dentista da eSB / Nº total de procedimentos individuais preventivos, curativos e exodontias realizadas pelo cirurgião-dentista da eSB) * 100',
+    cbos: cbosDentistas,
+    codes: { ciap2: ['Geral'], cid10: ['Geral'] },
+    sigtap: [
+      'NUMERADOR:',
+      '· 04.14.02.013-8 – Exodontia de dente permanente;',
+      '· 04.14.02.014-6 – Exodontia múltipla com alveoloplastia por sextante.',
+      '',
+      'DENOMINADOR:',
+      '· 01.01.02.005-8 – Aplicação de cariostático (por dente);',
+      '· 01.01.02.006-6 – Aplicação de selante (por dente);',
+      '· 01.01.02.007-4 – Aplicação tópica de flúor (individual por sessão);',
+      '· 01.01.02.008-2 – Evidenciação de placa bacteriana;',
+      '· 01.01.02.009-0 – Selamento provisório de cavidade dentária;',
+      '· 03.07.01.001-5 – Capeamento pulpar;',
+      '· 03.07.01.003-1 – Restauração de dente permanente anterior com resina composta;',
+      '· 03.07.01.006-6 – Tratamento inicial do dente traumatizado;',
+      '· 03.07.01.007-4 – Tratamento restaurador atraumático (TRA/ART);',
+      '· 03.07.01.008-2 – Restauração de dente decíduo posterior com resina composta;',
+      '· 03.07.01.010-4 – Restauração de dente decíduo posterior with ionômero de vidro;',
+      '· 03.07.01.011-2 – Restauração de dente decíduo anterior com resina composta;',
+      '· 03.07.01.012-0 – Restauração de dente permanente posterior com resina composta;',
+      '· 03.07.01.013-9 – Restauração de dente permanente posterior com amálgama;',
+      '· 03.07.02.001-0 – Acesso à polpa dentária e medicação (por dente);',
+      '· 03.07.02.002-9 – Curativo de demora com ou sem preparo biomecânico;',
+      '· 03.07.02.007-0 – Pulpotomia dentária;',
+      '· 03.07.03.002-4 - Raspagem e alisamento subgengivais (por sextante);',
+      '· 03.07.03.004-0 – Profilaxia / remoção da placa bacteriana;',
+      '· 03.07.03.005-9 – Raspagem, alisamento e polimento supragengivais (por sextante);',
+      '· 03.07.03.006-7 – Tratamento de gengivite ulcerativa necrosante aguda (guna);',
+      '· 03.07.03.007-5 – Tratamento de lesões da mucosa oral;',
+      '· 03.07.03.008-3 – Tratamento de pericoronarite;',
+      '· 04.14.02.013-8 – Exodontia de dente permanente;',
+      '· 04.14.02.014-6 – Exodontia múltipla com alveoloplastia por sextante.'
+    ],
+    registration: 'Registrar o atendimento no prontuário do paciente, se atentando aos procedimentos no local correto, considerando o preenchimento do Odontograma.',
+    objective: 'Reduzir procedimentos mutiladores através da prevenção.',
+    keywords: ['Exodontia', 'Extração'],
+    concepts: [
+      { 
+        term: 'Exodontia', 
+        definition: 'Procedimento odontológico de extração de dentes, classificado como simples ou complicado. Para este indicador, serão consideradas as exodontias de dentes permanentes, com alveoloplastia ou não.' 
+      }
+    ]
+  },
+  {
+    id: 'B4',
+    category: 'Saúde Bucal',
+    title: 'Escovação Supervisionada',
+    iconName: 'School',
+    color: 'bg-red-600',
+    description: 'Beneficiados pela ação coletiva de escovação (6 a 12 anos).',
+    formula: '(Nº total de crianças de 6 a 12 anos participantes da ação coletiva de escovação dental supervisionada realizada pela eSB / Nº total de crianças de 6 a 12 anos vinculadas à eSF/eAP de referência da eSB) * 100',
+    cbos: [
+      '2232-08 - Cirurgião-Dentista Clínico Geral',
+      '2232-93 - Cirurgião-Dentista da Estratégia Saúde da Família',
+      '2232-72 - Cirurgião-Dentista de Saúde Coletiva',
+      '3224-05 - Técnico em Saúde Bucal',
+      '3224-25 - Técnico em Saúde Bucal da Estratégia de Saúde da Família',
+      '3224-15 - Auxiliar em Saúde Bucal',
+      '3224-30 - Auxiliar em Saúde Bucal da Estratégia de Saúde da Família'
+    ],
+    codes: { ciap2: ['Geral'], cid10: ['Geral'] },
+    sigtap: ['Não se aplica'],
+    registration: 'Na Ficha de Atividade Coletiva, em "Tipo da atividade" marcar a opção "Avaliação / Procedimento coletivo". Em "Praticas em saúde", marcar a opção "Escovação dental supervisionada".',
+    objective: 'Promover higiene bucal em idade escolar.',
+    keywords: ['Escolar', 'Higiene Bucal'],
+    concepts: [
+      { 
+        term: 'Faixa etária escolar de 6 a 12 anos de idade', 
+        definition: 'Faixa de análise do Instituto Brasileiro de Geografia e Estatística (IBGE) para construção de indicador de proporção de crianças no ensino fundamental.' 
+      }
+    ]
+  },
+  {
+    id: 'B5',
+    category: 'Saúde Bucal',
+    title: 'Procedimentos Preventivos',
+    iconName: 'Toothbrush',
+    color: 'bg-orange-600',
+    description: 'Total de procedimentos preventivos individuais vs total de procedimentos.',
+    formula: '(Nº total de procedimentos odontológicos preventivos individuais / Nº total de procedimentos odontológicos individuais realizados) * 100',
+    cbos: [
+      '2232-08 - Cirurgião-Dentista Clínico Geral',
+      '2232-93 - Cirurgião-Dentista da Estratégia Saúde da Família',
+      '2232-72 - Cirurgião-Dentista de Saúde Coletiva',
+      '3224-05 - Técnico em Saúde Bucal',
+      '3224-25 - Técnico em Saúde Bucal da Estratégia de Saúde da Família'
+    ],
+    codes: { ciap2: ['Geral'], cid10: ['Geral'] },
+    sigtap: [
+      '01.01.02.005-8 - Aplicação de cariostático (por dente);',
+      '01.01.02.006-6 - Aplicação de selante (por dente);',
+      '01.01.02.007-4 - Aplicação tópica de flúor (individual por sessão);',
+      '01.01.02.008-2 - Evidenciação de placa bacteriana;',
+      '01.01.02.009-0 - Selamento provisório de cavidade dentária;',
+      '01.01.02.010-4 - Orientação de higiene bucal'
+    ],
+    registration: 'Registrar o atendimento no prontuário do paciente, se atentando aos procedimentos no local correto, considerando o preenchimento do Odontograma.',
+    objective: 'Priorizar ações que evitem o desenvolvimento de doenças bucais.',
+    keywords: ['Prevenção', 'Saúde Bucal'],
+    concepts: [
+      { 
+        term: 'Procedimentos odontológicos preventivos', 
+        definition: 'Medidas adotadas para evitar o desenvolvimento de doenças bucais, mantendo a saúde oral e reduzindo a necessidade de tratamentos mais complexos.' 
+      },
+      { 
+        term: 'Procedimentos odontológicos curativos', 
+        definition: 'Tratamentos para restaurar a saúde bucal quando os procedimentos preventivos não foram aplicados ou não foram suficientes para impedir a instalação e avanço da doença.' 
+      }
+    ]
+  },
+  {
+    id: 'B6',
+    category: 'Saúde Bucal',
+    title: 'ART (Tratamento Atraumático)',
+    iconName: 'Smile',
+    color: 'bg-yellow-500',
+    description: 'Proporção de ART em relação ao total de procedimentos restauradores.',
+    formula: '(Nº total de ART realizados pela eSB / Nº total de procedimentos restauradores realizados pela eSB) * 100',
+    cbos: cbosDentistas,
+    codes: { ciap2: ['Geral'], cid10: ['Geral'] },
+    sigtap: [
+      'NUMERADOR',
+      '03.07.01.007-4 – Tratamento restaurador atraumático (TRA/ART).',
+      '',
+      'DENOMINADOR',
+      '03.07.01.003-1 – Restauração de dente permanente anterior com resina composta;',
+      '03.07.01.008-2 – Restauração de dente decíduo posterior com resina composta;',
+      '03.07.01.009-0 – Restauração de dente decíduo posterior com amálgama;',
+      '03.07.01.0010-4 – Restauração de dente decíduo posterior com ionômero de vidro;',
+      '03.07.01.0011-2 – Restauração de dente decíduo anterior com resina composta;',
+      '03.07.01.0012-0 – Restauração de dente permanente posterior com resina composta;',
+      '03.07.01.0013-9 – Restauração de dente permanente posterior com amálgama;',
+      '03.07.01.007-4 – Tratamento restaurador atraumático (TRA/ART)'
+    ],
+    registration: 'Registrar o atendimento no prontuário do paciente, se atentando aos procedimentos no local correto, considerando o preenchimento do Odontograma.',
+    objective: 'Estimular técnicas minimamente invasivas.',
+    keywords: ['ART', 'Minimamente Invasivo'],
+    concepts: [
+      { 
+        term: 'Tratamento Restaurador Atraumático (ART)', 
+        definition: 'Técnica de odontologia minimamente invasiva que utiliza instrumentos manuais para remover cáries e restaurar a unidade dentária com materiais adesivos biocompatíveis.' 
+      }
+    ]
+  },
+
+  // --- CATEGORIA M: MULTIPROFISSIONAL ---
+  {
+    id: 'M1',
+    category: 'Multiprofissional',
+    title: 'Média de Atendimentos',
+    iconName: 'User',
+    color: 'bg-orange-600',
+    description: 'Média de atendimentos por pessoa realizados pela equipe eMulti.',
+    formula: 'Nº de atendimentos individuais e coletivos realizados pela eMulti / Nº de pessoas atendidas pela eMulti',
+    cbos: cbosEMulti,
+    codes: { ciap2: ['Variados'], cid10: ['Variados'] },
+    sigtap: ['03.01.01.007-2', '01.01.01.001-0'],
+    registration: `• Atendimentos Individuais: Registrar via Prontuário Eletrônico do Paciente.
+• Atendimentos Coletivos: Registrar via Ficha de Atividade Coletiva, incluindo o CNS de todos os profissionais participantes.
+• É fundamental que o profissional esteja corretamente vinculado à equipe eMulti no Cadastro Nacional de Estabelecimentos de Saúde (CNES).`,
+    objective: 'Monitorar o acesso pontual e contínuo da população atendida pela eMulti, considerando abordagens individuais e coletivas.',
+    keywords: ['eMulti', 'Acesso Multiprofissional'],
+    concepts: [
+      { 
+        term: 'Acesso', 
+        definition: 'Pode ser compreendido como o ato de oportunizar as diversas alternativas de adentrar aos serviços de saúde, associadas com a localização da unidade de saúde, a disponibilidade de horários e os dias de atendimento e oferta de serviços, bem como a possibilidade de utilizar os serviços ofertados de forma agendada ou não.' 
+      }
+    ]
+  },
+  {
+    id: 'M2',
+    category: 'Multiprofissional',
+    title: 'Ações Interprofissionais',
+    iconName: 'UsersThree',
+    color: 'bg-pink-400',
+    description: 'Proporção de ações compartilhadas pela eMulti.',
+    formula: 'Nº de ações compartilhadas realizadas pela eMulti / Nº de ações realizadas pela eMulti * 100',
+    cbos: cbosEMulti,
+    codes: { ciap2: ['Variados'], cid10: ['Variados'] },
+    sigtap: ['03.01.01.007-2'],
+    registration: `• Atendimentos Individuais Compartilhados: Registrar via Prontuário Eletrônico do Paciente. Incluir o profissional na Finalização do Atendimento em "Atendimento compartilhado".
+• Atendimentos Coletivos: Registrar via Ficha de Atividade Coletiva, incluindo o CNS de todos os profissionais participantes.
+• Compartilhamento do Cuidado: Realizar o compartilhamento de um cuidado através do prontuário do paciente, na aba "Compartilhamento de Cuidado, no Plano do SOAP. Gerenciar os cuidados que você compartilhou e outros compatilhados com você através do Menu lateral "Gestão de Filas - Cuidados compartilhados".`,
+    objective: 'Monitorar as ações realizadas pela eMulti de forma compartilhada.',
+    keywords: ['Interprofissionalidade', 'Matriciamento'],
+    concepts: [
+      { 
+        term: 'Ações interprofissionais', 
+        definition: 'Ações compartilhadas realizadas pela eMulti, podendo ser entre profissionais da mesma eMulti ou com profissionais de outras equipes e incluem:\n* Ações de atendimentos individuais compartilhados;\n* Atividades coletivas compartilhadas;\n* Compartilhamento de cuidado da funcionalidade do PEC na APS. \n\nOBS: Os atendimentos individuais compartilhados e as atividades coletivas compartilhadas serão consideradas compartilhadas quando realizadas de forma simultânea por minimamente 2 profissionais diferentes (CNS diferentes).' 
+      }
+    ]
+  }
+];
+
+const Modal = ({ isOpen, onClose, title, iconName, children }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      <div 
+        className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" 
+        onClick={onClose} 
+      />
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg relative overflow-hidden transform transition-all animate-in fade-in zoom-in duration-200">
+        <div className="bg-slate-50 border-b border-slate-200 p-4 flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <div className="bg-blue-100 p-2 rounded-lg">
+              <Icon name={iconName} className="w-5 h-5 text-blue-600" />
+            </div>
+            <h3 className="font-bold text-slate-800">{title}</h3>
+          </div>
+          <button 
+            onClick={onClose}
+            className="p-1 hover:bg-slate-200 rounded-full transition-colors text-slate-400 hover:text-slate-600"
+          >
+            <Icon name="X" className="w-6 h-6" />
+          </button>
+        </div>
+        <div className="p-6 max-h-[70vh] overflow-y-auto custom-scrollbar">
+          {children}
+        </div>
+        <div className="bg-slate-50 border-t border-slate-200 p-3 flex justify-end">
+          <button 
+            onClick={onClose}
+            className="px-4 py-2 bg-white border border-slate-300 rounded-lg text-sm font-bold text-slate-700 hover:bg-slate-100 transition-colors"
+          >
+            Fechar
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const App = () => {
+  const [selectedId, setSelectedId] = useState(indicators[0].id);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterCategory, setFilterCategory] = useState('Todos');
+  const [activeModal, setActiveModal] = useState(null);
+
+  const categories = ['Todos', 'Saúde da Família', 'Saúde Bucal', 'Multiprofissional'];
+
+  const filteredIndicators = useMemo(() => {
+    return indicators.filter(ind => {
+      const matchesSearch = ind.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                           ind.id.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory = filterCategory === 'Todos' || ind.category === filterCategory;
+      return matchesSearch && matchesCategory;
+    });
+  }, [searchTerm, filterCategory]);
+
+  const activeIndicator = indicators.find(ind => ind.id === selectedId) || indicators[0];
+
+  const hasGoodPractices = !!activeIndicator.goodPractices;
+  const hasRegistration = !!activeIndicator.registration;
+  const isMultiprofessional = activeIndicator.category === 'Multiprofissional';
+
+  return (
+    <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
+      <header className="bg-blue-800 text-white p-6 shadow-md">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="flex items-center gap-3">
+            <Icon name="LayoutDashboard" className="w-8 h-8 text-blue-300" />
+            <div>
+              <h1 className="text-2xl font-bold tracking-tight">Indicadores de Qualidade</h1>
+              <p className="text-blue-100 text-sm font-medium tracking-wide">Cofinanciamento APS - Versão 2025</p>
+            </div>
+          </div>
+          <div className="relative w-full md:w-72">
+            <Icon name="Search" className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-300 w-4 h-4" />
+            <input
+              type="text"
+              placeholder="Buscar indicador..."
+              className="w-full bg-blue-700/50 border border-blue-600 rounded-full py-2 pl-10 pr-4 text-sm placeholder-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400 text-white transition-all"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+        </div>
+      </header>
+
+      <div className="bg-white border-b border-slate-200 sticky top-0 z-40">
+        <div className="max-w-6xl mx-auto px-6 py-2 flex gap-4 overflow-x-auto no-scrollbar">
+          {categories.map(cat => (
+            <button
+              key={cat}
+              onClick={() => setFilterCategory(cat)}
+              className={`px-4 py-2 text-sm font-semibold transition-all border-b-2 whitespace-nowrap ${
+                filterCategory === cat 
+                ? 'border-blue-600 text-blue-600' 
+                : 'border-transparent text-slate-400 hover:text-slate-600'
+              }`}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <main className="flex-1 max-w-6xl mx-auto w-full p-4 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <nav className="lg:col-span-4 space-y-3 max-h-[calc(100vh-250px)] overflow-y-auto pr-2 custom-scrollbar">
+          <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 px-2">Lista de Indicadores</h2>
+          {filteredIndicators.map((ind) => (
+            <button
+              key={ind.id}
+              onClick={() => setSelectedId(ind.id)}
+              className={`w-full text-left p-4 rounded-xl transition-all border flex items-center gap-4 group ${
+                selectedId === ind.id 
+                ? 'bg-white border-blue-500 shadow-md transform scale-[1.02]' 
+                : 'bg-white/50 border-slate-200 hover:border-blue-300 hover:bg-white'
+              }`}
+            >
+              <div className={`p-2 rounded-lg ${ind.color} text-white shadow-sm`}>
+                <Icon name={ind.iconName} />
+              </div>
+              <div className="flex-1">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{ind.id} • {ind.category}</span>
+                <h3 className={`font-semibold text-sm leading-tight ${selectedId === ind.id ? 'text-blue-700' : 'text-slate-700'}`}>
+                  {ind.title}
+                </h3>
+              </div>
+              <Icon name="ChevronRight" className={`w-4 h-4 transition-transform group-hover:translate-x-1 ${selectedId === ind.id ? 'text-blue-500' : 'text-slate-300'}`} />
+            </button>
+          ))}
+        </nav>
+
+        <section className="lg:col-span-8">
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden min-h-[600px] flex flex-col">
+            <div className={`${activeIndicator.color} p-8 text-white relative overflow-hidden`}>
+              <div className="absolute right-[-20px] bottom-[-20px] opacity-10 scale-[3] rotate-12">
+                <Icon name={activeIndicator.iconName} className="w-24 h-24" />
+              </div>
+              
+              <div className="relative z-10">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="bg-white/20 px-3 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest border border-white/20">
+                    Ficha de Qualificação {activeIndicator.id}
+                  </span>
+                </div>
+                <h2 className="text-3xl font-extrabold mb-4 leading-tight">{activeIndicator.title}</h2>
+                <p className="text-white/90 text-lg leading-relaxed max-w-2xl font-medium">
+                  {activeIndicator.description}
+                </p>
+              </div>
+            </div>
+
+            <div className="p-8 space-y-8 flex-1">
+              <div className="flex gap-4">
+                <div className="bg-blue-50 p-3 rounded-xl h-fit">
+                  <Icon name="Target" className="w-6 h-6 text-blue-600" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-slate-800 text-lg mb-2">Objetivo</h3>
+                  <p className="text-slate-600 leading-relaxed font-medium">
+                    {activeIndicator.objective}
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200">
+                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                  <Icon name="Info" className="w-4 h-4" /> Especificações Técnicas
+                </h3>
+                <div className="grid grid-cols-2 sm:grid-cols-6 gap-2">
+                  {/* Registro agora em primeiro lugar conforme solicitado */}
+                  {hasRegistration && (
+                    <button 
+                      onClick={() => setActiveModal('registration')} 
+                      className="flex flex-col items-center gap-2 p-3 bg-white border border-slate-200 rounded-xl hover:border-blue-500 hover:shadow-md transition-all group"
+                    >
+                      <Icon name="ClipboardList" className="w-5 h-5 text-blue-600 group-hover:scale-110 transition-transform" />
+                      <span className="text-[10px] font-bold text-slate-700">Registro</span>
+                    </button>
+                  )}
+
+                  {hasGoodPractices && (
+                    <button 
+                      onClick={() => setActiveModal('goodPractices')} 
+                      className="flex flex-col items-center gap-2 p-3 bg-white border border-slate-200 rounded-xl hover:border-blue-500 hover:shadow-md transition-all group"
+                    >
+                      <Icon name="CheckCircle" className="w-5 h-5 text-emerald-600 group-hover:scale-110 transition-transform" />
+                      <span className="text-[10px] font-bold text-slate-700">Práticas</span>
+                    </button>
+                  )}
+                  
+                  <button onClick={() => setActiveModal('formula')} className="flex flex-col items-center gap-2 p-3 bg-white border border-slate-200 rounded-xl hover:border-blue-500 hover:shadow-md transition-all group">
+                    <Icon name="Calculator" className="w-5 h-5 text-blue-600 group-hover:scale-110 transition-transform" />
+                    <span className="text-[10px] font-bold text-slate-700">Cálculo</span>
+                  </button>
+                  <button onClick={() => setActiveModal('cbos')} className="flex flex-col items-center gap-2 p-3 bg-white border border-slate-200 rounded-xl hover:border-blue-500 hover:shadow-md transition-all group">
+                    <Icon name="Briefcase" className="w-5 h-5 text-blue-600 group-hover:scale-110 transition-transform" />
+                    <span className="text-[10px] font-bold text-slate-700">CBOs</span>
+                  </button>
+                  
+                  {/* Botões ocultados para a categoria Multiprofissional (M1 e M2) conforme solicitado */}
+                  {!isMultiprofessional && (
+                    <>
+                      <button onClick={() => setActiveModal('codes')} className="flex flex-col items-center gap-2 p-3 bg-white border border-slate-200 rounded-xl hover:border-blue-500 hover:shadow-md transition-all group">
+                        <Icon name="Code" className="w-5 h-5 text-blue-600 group-hover:scale-110 transition-transform" />
+                        <span className="text-[10px] font-bold text-slate-700">CID10/CIAP2</span>
+                      </button>
+                      <button onClick={() => setActiveModal('sigtap')} className="flex flex-col items-center gap-2 p-3 bg-white border border-slate-200 rounded-xl hover:border-blue-500 hover:shadow-md transition-all group">
+                        <Icon name="FileText" className="w-5 h-5 text-blue-600 group-hover:scale-110 transition-transform" />
+                        <span className="text-[10px] font-bold text-slate-700">SIGTAP</span>
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex gap-4">
+                <div className="bg-blue-50 p-3 rounded-xl h-fit">
+                  <Icon name="BookOpen" className="w-6 h-6 text-blue-600" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-bold text-slate-800 text-lg mb-4">Conceitos Importantes</h3>
+                  <div className="grid gap-4">
+                    {activeIndicator.concepts.map((concept, idx) => (
+                      <div key={idx} className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <h4 className="font-bold text-blue-800 text-sm mb-1">{concept.term}</h4>
+                        <p className="text-slate-600 text-sm leading-relaxed font-medium whitespace-pre-line">
+                          {concept.definition}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <style dangerouslySetInnerHTML={{ __html: `
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes zoom-in { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .animate-in { animation: fade-in 0.2s ease-out forwards; }
+        .zoom-in { animation: zoom-in 0.2s cubic-bezier(0, 0, 0.2, 1) forwards; }
+      `}} />
+
+      <Modal 
+        isOpen={activeModal === 'goodPractices'} 
+        onClose={() => setActiveModal(null)} 
+        title="Boas Práticas Cobradas" 
+        iconName="CheckCircle"
+      >
+        <div className="space-y-4">
+          <p className="text-sm text-slate-600 font-medium">
+            Para que este indicador seja pontuado, as seguintes boas práticas são monitoradas e avaliadas:
+          </p>
+          <div className="space-y-3">
+            {activeIndicator.goodPractices?.map((practice, i) => (
+              <div key={i} className="flex gap-3 p-4 bg-emerald-50 border border-emerald-100 rounded-xl items-start">
+                <Icon name="CheckCircle" className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                <span className="text-sm text-emerald-900 font-medium leading-tight">{practice}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Modal>
+
+      <Modal 
+        isOpen={activeModal === 'registration'} 
+        onClose={() => setActiveModal(null)} 
+        title="Orientações de Registro" 
+        iconName="ClipboardList"
+      >
+        <div className="space-y-4">
+          <p className="text-sm text-slate-600 font-medium">
+            Procedimento correto de inserção de dados nos sistemas oficiais:
+          </p>
+          <div className="p-5 bg-blue-50 border border-blue-200 rounded-2xl">
+            <p className="text-sm text-blue-900 leading-relaxed font-medium whitespace-pre-line">
+              {activeIndicator.registration}
+            </p>
+          </div>
+        </div>
+      </Modal>
+
+      <Modal isOpen={activeModal === 'formula'} onClose={() => setActiveModal(null)} title="Método de Cálculo" iconName="Calculator">
+        <div className="space-y-4">
+          <p className="text-sm text-slate-600 font-bold uppercase tracking-wide">Fórmula de Cálculo:</p>
+          <div className="bg-blue-50 p-5 rounded-2xl border border-blue-100 font-mono text-xs text-blue-900 leading-relaxed shadow-inner break-words whitespace-pre-line">
+            {activeIndicator.formula}
+          </div>
+        </div>
+      </Modal>
+
+      <Modal isOpen={activeModal === 'cbos'} onClose={() => setActiveModal(null)} title="Profissionais (CBOs)" iconName="Briefcase">
+        <div className="space-y-4">
+          <p className="text-sm text-slate-600 font-medium">CBOs habilitados para registro:</p>
+          <div className="grid grid-cols-1 gap-2">
+            {activeIndicator.cbos.map((cbo, i) => (
+              <div key={i} className="flex items-center gap-3 p-3 bg-white border border-slate-200 rounded-xl shadow-sm font-bold text-xs text-slate-700">
+                <div className="w-2 h-2 rounded-full bg-blue-500 shrink-0" />
+                {cbo}
+              </div>
+            ))}
+          </div>
+        </div>
+      </Modal>
+
+      <Modal isOpen={activeModal === 'codes'} onClose={() => setActiveModal(null)} title="CID10/CIAP2" iconName="Code">
+        <div className="space-y-6">
+          <div className="space-y-3">
+            <h4 className="text-xs font-black uppercase tracking-widest text-slate-400">CIAP-2</h4>
+            <div className="flex flex-wrap gap-2">
+              {activeIndicator.codes.ciap2.map(c => (
+                <span key={c} className="bg-orange-100 text-orange-700 px-3 py-1.5 rounded-lg text-xs font-black border border-orange-200">{c}</span>
+              ))}
+            </div>
+          </div>
+          <div className="space-y-3">
+            <h4 className="text-xs font-black uppercase tracking-widest text-slate-400">CID-10</h4>
+            <div className="flex flex-wrap gap-2">
+              {activeIndicator.codes.cid10.map(c => (
+                <span key={c} className="bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg text-xs font-black border border-blue-200">{c}</span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </Modal>
+
+      <Modal isOpen={activeModal === 'sigtap'} onClose={() => setActiveModal(null)} title="Procedimentos SIGTAP" iconName="FileText">
+        <div className="space-y-3">
+          <p className="text-sm text-slate-600 font-medium">Procedimentos vinculados:</p>
+          {activeIndicator.sigtap.map((s, i) => (
+            <div key={i} className={`p-4 bg-slate-50 border border-slate-200 rounded-xl flex items-center gap-3 font-bold text-xs text-slate-600 ${s === '' ? 'h-0 py-0 border-0 opacity-0' : ''}`}>
+              {s !== '' && s !== 'Não se aplica' && <Icon name="ExternalLink" className="w-4 h-4 text-slate-400 shrink-0" />}
+              <span className={s === 'NUMERADOR' || s === 'DENOMINADOR' || s === 'NUMERADOR:' || s === 'DENOMINADOR:' ? 'text-blue-800 border-b-2 border-blue-200 pb-1 w-full text-sm' : ''}>
+                {s}
+              </span>
+            </div>
+          ))}
+        </div>
+      </Modal>
+
+      <footer className="bg-slate-800 text-slate-400 py-8 text-center text-[10px] border-t border-slate-700 mt-auto">
+        <div className="max-w-6xl mx-auto px-6 text-center">
+          <p className="font-bold tracking-widest uppercase">Informações baseadas nas Notas Metodológicas do MS</p>
+        </div>
+      </footer>
+
+      {/* Nota de Autoria Fixa no Canto Inferior Direito */}
+      <div className="fixed bottom-4 right-4 z-50 pointer-events-none md:pointer-events-auto">
+        <div className="bg-white/80 backdrop-blur-md border border-slate-200 px-4 py-2 rounded-full shadow-lg flex items-center gap-2">
+          <div className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
+          <span className="text-[10px] font-black text-slate-800 tracking-tighter uppercase whitespace-nowrap">
+            Autoria: Júlia Ribeiro
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default App;
